@@ -1,0 +1,173 @@
+// PassPoint — modelo de datos (SPEC §3)
+// Prisma como ÚNICA capa de acceso a datos (CLAUDE.md → Estilo técnico).
+// Regla dura: solo Question.status = HUMAN_APPROVED se sirve a usuarios.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────── Enums ───────────────────────────────
+
+enum Lang {
+  ES
+  EN
+}
+
+enum QuestionStatus {
+  DRAFT
+  AI_VERIFIED
+  HUMAN_APPROVED
+}
+
+enum EntitlementScope {
+  STATE
+  ALL
+}
+
+enum AttemptMode {
+  PRACTICE
+  MOCK
+}
+
+// ─────────────────────────────── Modelos ─────────────────────────────
+
+/// Estado del DMV (CA, TX, ...). Define el formato real del examen.
+model State {
+  id                 String   @id @default(cuid())
+  code               String   @unique // CA, TX, FL...
+  nameEn             String
+  nameEs             String
+  examQuestionCount  Int // nº de preguntas del examen real
+  passThreshold      Int // nº mínimo de aciertos para aprobar
+  manualVersion      String?
+  manualUrl          String?
+  active             Boolean  @default(false)
+
+  topics       Topic[]
+  entitlements Entitlement[]
+  attempts     Attempt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Tema dentro de un estado (p. ej. "Señales de tránsito").
+model Topic {
+  id      String @id @default(cuid())
+  stateId String
+  slug    String
+  nameEn  String
+  nameEs  String
+  order   Int
+
+  state     State      @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  questions Question[]
+
+  @@unique([stateId, slug])
+  @@index([stateId, order])
+}
+
+/// Pregunta bilingüe anclada a un fragmento del manual oficial (manualRef).
+model Question {
+  id             String         @id @default(cuid())
+  topicId        String
+  textEn         String
+  textEs         String
+  /// [{ textEn, textEs, correct }]
+  options        Json
+  explanationEn  String
+  explanationEs  String
+  manualRef      String // sección del manual que la sustenta (obligatorio)
+  difficulty     Int            @default(1) // 1–3
+  status         QuestionStatus @default(DRAFT)
+  version        Int            @default(1)
+  isFree         Boolean        @default(false) // parte del set gratis (SPEC §5)
+
+  topic     Topic              @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userStats UserQuestionStat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([topicId, status])
+  @@index([status])
+}
+
+/// Usuario (auth por magic link vía Supabase).
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  preferredLang Lang     @default(ES)
+  createdAt     DateTime @default(now())
+
+  entitlements Entitlement[]
+  attempts     Attempt[]
+  questionStats UserQuestionStat[]
+  events       Event[]
+}
+
+/// Derecho de acceso comprado (por estado o all-access). Compra única de por vida.
+model Entitlement {
+  id              String           @id @default(cuid())
+  userId          String
+  scope           EntitlementScope
+  stateId         String? // requerido si scope = STATE
+  stripeSessionId String           @unique // idempotencia del webhook (CLAUDE.md)
+  createdAt       DateTime         @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  state State? @relation(fields: [stateId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+/// Intento de práctica o simulacro.
+model Attempt {
+  id        String      @id @default(cuid())
+  userId    String
+  stateId   String
+  mode      AttemptMode
+  /// [{ questionId, chosenIndex, correct }]
+  answers   Json
+  score     Int
+  passed    Boolean
+  createdAt DateTime    @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  state State @relation(fields: [stateId], references: [id], onDelete: Cascade)
+
+  @@index([userId, stateId])
+}
+
+/// Estadística por usuario+pregunta. Alimenta repaso de falladas y readiness (SPEC §5).
+model UserQuestionStat {
+  userId     String
+  questionId String
+  timesSeen  Int      @default(0)
+  timesWrong Int      @default(0)
+  lastSeenAt DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, questionId])
+  @@index([userId])
+}
+
+/// Analítica interna mínima.
+model Event {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([type, createdAt])
+}

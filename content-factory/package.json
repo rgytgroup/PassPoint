@@ -1,0 +1,20 @@
+{
+  "name": "@passpoint/content-factory",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PassPoint — fábrica de contenido: pipeline CLI ingest→generate→verify→review→import→watch (SPEC §6)",
+  "bin": {
+    "factory": "./dist/cli.js"
+  },
+  "scripts": {
+    "start": "tsx src/cli.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

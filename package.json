@@ -1,0 +1,20 @@
+{
+  "name": "passpoint",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PassPoint — PWA bilingüe de preparación para el examen teórico del DMV (USA). Producto de rgytgroup.",
+  "workspaces": [
+    "apps/*",
+    "content-factory"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:api": "npm run start:dev --workspace apps/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "factory": "npm run start --workspace content-factory --"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

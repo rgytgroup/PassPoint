@@ -1,0 +1,40 @@
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Builds
+dist/
+build/
+.next/
+.vercel/
+.turbo/
+
+# Vite / PWA
+apps/web/dev-dist/
+apps/web/.vite/
+
+# Prisma (cliente generado)
+apps/api/node_modules/.prisma/
+**/generated/
+
+# Entorno y secretos (NUNCA versionar valores reales — ver .env.example)
+.env
+.env.*
+!.env.example
+
+# Contenido de la fábrica (artefactos locales del pipeline)
+content-factory/.cache/
+content-factory/manuals/
+content-factory/output/
+
+# Logs y temporales
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Editores
+.idea/
+*.swp
+.vscode/*
+!.vscode/extensions.json
