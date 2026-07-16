@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
+import { StateHub } from './pages/StateHub';
 import { Placeholder } from './pages/Placeholder';
 
 // Rutas del SPEC §4. Las páginas marcadas como Placeholder se implementan
@@ -14,7 +15,7 @@ export function App() {
         <Route path="/repaso" element={<Placeholder title="Repaso de falladas" spec="SPEC §4.6" />} />
 
         {/* Estado y sus módulos */}
-        <Route path="/:state" element={<Placeholder title="Hub del estado" spec="SPEC §4.2" />} />
+        <Route path="/:state" element={<StateHub />} />
         <Route
           path="/:state/practica/:topic"
           element={<Placeholder title="Práctica por tema" spec="SPEC §4.3" />}

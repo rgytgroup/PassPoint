@@ -14,7 +14,7 @@ interface LangContextValue {
   /** Traducción de una clave de UI. Toggle ES⇄EN instantáneo, sin recarga (SPEC §4.3). */
   t: (key: StringKey) => string;
   /** Elige el campo …Es / …En de un objeto bilingüe del contenido. */
-  pick: <T extends Record<string, unknown>>(obj: T, base: string) => unknown;
+  pick: <T>(obj: T, base: string) => string;
 }
 
 const STORAGE_KEY = 'passpoint.lang';
@@ -50,8 +50,10 @@ export function LangProvider({ children }: { children: ReactNode }) {
   const t = useCallback((key: StringKey) => strings[lang][key], [lang]);
 
   const pick = useCallback(
-    <T extends Record<string, unknown>>(obj: T, base: string) =>
-      obj[`${base}${lang === 'ES' ? 'Es' : 'En'}`],
+    <T,>(obj: T, base: string): string =>
+      (obj as Record<string, unknown>)[
+        `${base}${lang === 'ES' ? 'Es' : 'En'}`
+      ] as string,
     [lang],
   );
 
