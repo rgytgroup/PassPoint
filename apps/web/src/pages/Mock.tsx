@@ -25,6 +25,7 @@ export function Mock() {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
 
   const questions = mock?.questions ?? [];
@@ -35,6 +36,7 @@ export function Mock() {
     setIndex(0);
     setAnswers({});
     setSubmitted(false);
+    setReviewing(false);
     setTimeLeft((mock?.questions.length ?? 0) * SECONDS_PER_QUESTION);
   }, [mock]);
 
@@ -103,6 +105,104 @@ export function Mock() {
     );
   }
 
+  // ─── Revisión post-simulacro ───
+  if (submitted && reviewing) {
+    return (
+      <section>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-slate-900">
+            Revisión de respuestas
+          </h1>
+          <button
+            onClick={() => setReviewing(false)}
+            className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium hover:bg-slate-100"
+          >
+            ← Resultados
+          </button>
+        </div>
+
+        <ol className="mt-6 space-y-6">
+          {questions.map((q, qi) => {
+            const chosen = answers[q.id];
+            const gotItRight =
+              chosen !== undefined && q.options[chosen]?.correct;
+            return (
+              <li
+                key={q.id}
+                className="rounded-lg border border-slate-200 bg-white p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h2 className="font-semibold text-slate-900">
+                    {qi + 1}. {pick(q, 'text')}
+                  </h2>
+                  <span
+                    className={`shrink-0 rounded-md px-2 py-0.5 text-xs font-medium ${
+                      gotItRight
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {gotItRight ? 'Correcta' : 'Incorrecta'}
+                  </span>
+                </div>
+
+                <ul className="mt-3 space-y-2">
+                  {q.options.map((option, i) => {
+                    const isCorrect = option.correct;
+                    const isChosen = chosen === i;
+                    let cls = 'border-slate-200 bg-white text-slate-700';
+                    if (isCorrect) cls = 'border-green-500 bg-green-50 text-green-900';
+                    else if (isChosen) cls = 'border-red-400 bg-red-50 text-red-900';
+                    return (
+                      <li
+                        key={i}
+                        className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm ${cls}`}
+                      >
+                        <span>{pick(option, 'text')}</span>
+                        <span className="ml-2 shrink-0 text-xs font-medium">
+                          {isCorrect && '✓ Correcta'}
+                          {!isCorrect && isChosen && 'Tu respuesta'}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {chosen === undefined && (
+                  <p className="mt-2 text-xs font-medium text-amber-600">
+                    No respondiste esta pregunta.
+                  </p>
+                )}
+
+                <p className="mt-3 text-sm text-slate-700">
+                  {pick(q, 'explanation')}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  📖 Referencia del manual: {q.manualRef}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+
+        <div className="mt-8 flex flex-wrap gap-3">
+          <button
+            onClick={() => setReviewing(false)}
+            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          >
+            Volver a resultados
+          </button>
+          <button
+            onClick={() => setAttempt((a) => a + 1)}
+            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-100"
+          >
+            Nuevo simulacro
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   // ─── Resultados ───
   if (submitted && results) {
     const timeUsed = totalTime - timeLeft;
@@ -149,10 +249,16 @@ export function Mock() {
           ))}
         </ul>
 
-        <div className="mt-8 flex gap-3">
+        <div className="mt-8 flex flex-wrap gap-3">
+          <button
+            onClick={() => setReviewing(true)}
+            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          >
+            Revisar preguntas
+          </button>
           <button
             onClick={() => setAttempt((a) => a + 1)}
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-100"
           >
             Nuevo simulacro
           </button>
