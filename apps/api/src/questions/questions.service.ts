@@ -26,4 +26,17 @@ export class QuestionsService {
       orderBy: { difficulty: 'asc' },
     });
   }
+
+  /**
+   * Preguntas de un tema identificado por código de estado + slug (SPEC §4.3).
+   * Devuelve null si el tema no existe (para responder 404).
+   */
+  async findForStateTopic(code: string, slug: string, onlyFree = false) {
+    const topic = await this.prisma.topic.findFirst({
+      where: { slug, state: { code: code.toUpperCase() } },
+      select: { id: true },
+    });
+    if (!topic) return null;
+    return this.findForTopic(topic.id, onlyFree);
+  }
 }

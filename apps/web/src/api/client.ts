@@ -1,4 +1,4 @@
-import type { StateSummary, StateDetail } from './types';
+import type { StateSummary, StateDetail, Question } from './types';
 
 // En dev, Vite hace proxy de /api → http://localhost:3000 (ver vite.config.ts).
 // En prod se sirve desde el mismo origen o VITE_API_BASE.
@@ -17,4 +17,7 @@ export const api = {
   listStates: () => get<StateSummary[]>('/states'),
   /** Estado por código con sus temas (SPEC §4.2). */
   getState: (code: string) => get<StateDetail | null>(`/states/${code}`),
+  /** Preguntas HUMAN_APPROVED de un tema para la práctica (SPEC §4.3). */
+  getTopicQuestions: (code: string, slug: string) =>
+    get<Question[]>(`/states/${code}/topics/${slug}/questions`),
 };

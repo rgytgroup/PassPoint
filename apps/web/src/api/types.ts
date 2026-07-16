@@ -25,3 +25,22 @@ export interface Topic {
 export interface StateDetail extends StateSummary {
   topics: Topic[];
 }
+
+export interface QuestionOption {
+  textEn: string;
+  textEs: string;
+  correct: boolean;
+}
+
+export interface Question {
+  id: string;
+  topicId: string;
+  textEn: string;
+  textEs: string;
+  options: QuestionOption[];
+  explanationEn: string;
+  explanationEs: string;
+  manualRef: string;
+  difficulty: number;
+  isFree: boolean;
+}
