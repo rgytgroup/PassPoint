@@ -1,6 +1,11 @@
 import { Module } from '@nestjs/common';
+import { AttemptsController } from './attempts.controller';
+import { AttemptsService } from './attempts.service';
 
-// Práctica y simulacro (SPEC §4.3, §4.4). Servicios y controlador se
-// implementan en la fase de motor de examen; el módulo se registra aquí.
-@Module({})
+// Práctica y simulacro (SPEC §4.3, §4.4). El simulacro ya está; la
+// persistencia de intentos (Attempt) se añade con auth de usuario.
+@Module({
+  controllers: [AttemptsController],
+  providers: [AttemptsService],
+})
 export class AttemptsModule {}

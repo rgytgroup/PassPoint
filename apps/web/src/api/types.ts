@@ -44,3 +44,25 @@ export interface Question {
   difficulty: number;
   isFree: boolean;
 }
+
+export interface TopicRef {
+  slug: string;
+  nameEn: string;
+  nameEs: string;
+}
+
+export interface MockQuestion extends Question {
+  topic: TopicRef;
+}
+
+export interface MockExam {
+  state: {
+    id: string;
+    code: string;
+    nameEn: string;
+    nameEs: string;
+    examQuestionCount: number;
+    passThreshold: number;
+  };
+  questions: MockQuestion[];
+}

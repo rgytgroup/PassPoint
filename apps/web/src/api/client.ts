@@ -1,4 +1,4 @@
-import type { StateSummary, StateDetail, Question } from './types';
+import type { StateSummary, StateDetail, Question, MockExam } from './types';
 
 // En dev, Vite hace proxy de /api → http://localhost:3000 (ver vite.config.ts).
 // En prod se sirve desde el mismo origen o VITE_API_BASE.
@@ -20,4 +20,6 @@ export const api = {
   /** Preguntas HUMAN_APPROVED de un tema para la práctica (SPEC §4.3). */
   getTopicQuestions: (code: string, slug: string) =>
     get<Question[]>(`/states/${code}/topics/${slug}/questions`),
+  /** Simulacro del estado: preguntas barajadas con su tema (SPEC §4.4). */
+  getMock: (code: string) => get<MockExam>(`/states/${code}/mock`),
 };
