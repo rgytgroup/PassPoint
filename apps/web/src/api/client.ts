@@ -4,6 +4,7 @@ import type {
   Question,
   MockExam,
   ReviewQuestion,
+  Readiness,
 } from './types';
 
 // En dev, Vite hace proxy de /api → http://localhost:3000 (ver vite.config.ts).
@@ -79,4 +80,6 @@ export const api = {
   /** Registra una respuesta del repaso; al acertar, limpia la pregunta. */
   recordReviewAnswer: (questionId: string, correct: boolean) =>
     post<{ ok: boolean }>('/me/review/answer', { questionId, correct }),
+  /** Probabilidad de aprobar del usuario en un estado (requiere sesión, SPEC §5). */
+  getReadiness: (code: string) => get<Readiness>(`/me/readiness/${code}`),
 };

@@ -61,6 +61,13 @@ export interface ReviewQuestion extends Question {
   timesWrong: number;
 }
 
+export interface Readiness {
+  percent: number;
+  seen: number;
+  mastered: number;
+  total: number;
+}
+
 export interface MockExam {
   state: {
     id: string;

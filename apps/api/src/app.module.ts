@@ -9,6 +9,7 @@ import { EntitlementsModule } from './entitlements/entitlements.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ReviewModule } from './review/review.module';
+import { ReadinessModule } from './readiness/readiness.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ReviewModule } from './review/review.module';
     AttemptsModule,
     EntitlementsModule,
     ReviewModule,
+    ReadinessModule,
   ],
   controllers: [HealthController],
 })

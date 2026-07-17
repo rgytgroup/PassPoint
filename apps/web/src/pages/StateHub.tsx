@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
 import { api } from '../api/client';
 import { useAsync } from '../api/useAsync';
+import { ReadinessCard } from '../components/ReadinessCard';
 
 export function StateHub() {
   const { state: code = '' } = useParams();
@@ -47,6 +48,8 @@ export function StateHub() {
         Examen de {state.examQuestionCount} preguntas · aprueba con{' '}
         {state.passThreshold}.
       </p>
+
+      <ReadinessCard code={code} />
 
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
