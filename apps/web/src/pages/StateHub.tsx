@@ -3,6 +3,7 @@ import { useLang } from '../i18n/LangContext';
 import { api } from '../api/client';
 import { useAsync } from '../api/useAsync';
 import { ReadinessCard } from '../components/ReadinessCard';
+import { AccessBanner } from '../components/AccessBanner';
 
 export function StateHub() {
   const { state: code = '' } = useParams();
@@ -49,6 +50,7 @@ export function StateHub() {
         {state.passThreshold}.
       </p>
 
+      <AccessBanner code={code} />
       <ReadinessCard code={code} />
 
       <div className="mt-6 flex flex-wrap gap-3">

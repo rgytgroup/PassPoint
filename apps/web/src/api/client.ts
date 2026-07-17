@@ -82,4 +82,6 @@ export const api = {
     post<{ ok: boolean }>('/me/review/answer', { questionId, correct }),
   /** Probabilidad de aprobar del usuario en un estado (requiere sesión, SPEC §5). */
   getReadiness: (code: string) => get<Readiness>(`/me/readiness/${code}`),
+  /** ¿El usuario tiene acceso pagado a un estado? (requiere sesión, SPEC §5). */
+  getAccess: (code: string) => get<{ access: boolean }>(`/me/access/${code}`),
 };

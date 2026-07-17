@@ -10,17 +10,26 @@ import {
 import type { User } from '@prisma/client';
 import { AttemptsService } from './attempts.service';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
+import { OptionalSupabaseAuthGuard } from '../auth/optional-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { EntitlementsService } from '../entitlements/entitlements.service';
 import type { SaveAttemptDto } from './dto';
 
 @Controller()
 export class AttemptsController {
-  constructor(private readonly attempts: AttemptsService) {}
+  constructor(
+    private readonly attempts: AttemptsService,
+    private readonly entitlements: EntitlementsService,
+  ) {}
 
-  // Simulacro por estado (SPEC §4.4) — público.
+  // Simulacro por estado (SPEC §4.4). Freemium (§5): sin acceso, solo isFree.
   @Get('states/:code/mock')
-  async mock(@Param('code') code: string) {
-    const mock = await this.attempts.buildMock(code);
+  @UseGuards(OptionalSupabaseAuthGuard)
+  async mock(@Param('code') code: string, @CurrentUser() user?: User) {
+    const entitled = user
+      ? await this.entitlements.hasAccess(user.id, code)
+      : false;
+    const mock = await this.attempts.buildMock(code, !entitled);
     if (mock === null) {
       throw new NotFoundException(`Estado «${code}» no encontrado.`);
     }

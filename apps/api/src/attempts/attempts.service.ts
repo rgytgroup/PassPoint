@@ -91,7 +91,7 @@ export class AttemptsService {
    * Nota: con pocos datos sembrados sirve las que haya disponibles; con el
    * banco completo llegará a examQuestionCount.
    */
-  async buildMock(code: string) {
+  async buildMock(code: string, onlyFree = false) {
     const state = await this.prisma.state.findUnique({
       where: { code: code.toUpperCase() },
       select: {
@@ -109,6 +109,7 @@ export class AttemptsService {
       where: {
         status: QuestionStatus.HUMAN_APPROVED,
         topic: { stateId: state.id },
+        ...(onlyFree ? { isFree: true } : {}),
       },
       include: {
         topic: { select: { slug: true, nameEn: true, nameEs: true } },

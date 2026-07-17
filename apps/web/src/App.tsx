@@ -6,6 +6,7 @@ import { Practice } from './pages/Practice';
 import { Mock } from './pages/Mock';
 import { Signs } from './pages/Signs';
 import { Repaso } from './pages/Repaso';
+import { Precios } from './pages/Precios';
 import { Login } from './pages/Login';
 import { Placeholder } from './pages/Placeholder';
 
@@ -17,7 +18,7 @@ export function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/entrar" element={<Login />} />
-        <Route path="/precios" element={<Placeholder title="Precios" spec="SPEC §4.7" />} />
+        <Route path="/precios" element={<Precios />} />
         <Route path="/repaso" element={<Repaso />} />
 
         {/* Estado y sus módulos */}
