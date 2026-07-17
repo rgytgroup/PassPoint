@@ -55,6 +55,12 @@ export interface MockQuestion extends Question {
   topic: TopicRef;
 }
 
+export interface ReviewQuestion extends Question {
+  topic: TopicRef;
+  stateCode: string;
+  timesWrong: number;
+}
+
 export interface MockExam {
   state: {
     id: string;

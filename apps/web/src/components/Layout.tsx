@@ -14,6 +14,14 @@ export function Layout() {
             {t('appName')}
           </Link>
           <div className="flex items-center gap-2">
+            {email && (
+              <Link
+                to="/repaso"
+                className="rounded-md px-2 py-1 text-sm font-medium text-slate-700 hover:bg-slate-100"
+              >
+                {t('review')}
+              </Link>
+            )}
             {configured &&
               (email ? (
                 <Link
