@@ -24,8 +24,27 @@ function getClient(): GoogleGenAI {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/** Limpia la respuesta: quita fences markdown y recorta al bloque JSON. */
+function cleanJson(text: string): string {
+  let t = text.trim();
+  if (t.startsWith('```')) {
+    t = t
+      .replace(/^```(?:json)?/i, '')
+      .replace(/```$/, '')
+      .trim();
+  }
+  // Recorta a lo que hay entre el primer [ o { y su cierre correspondiente.
+  const firstArr = t.indexOf('[');
+  const firstObj = t.indexOf('{');
+  const start =
+    firstArr === -1 ? firstObj : firstObj === -1 ? firstArr : Math.min(firstArr, firstObj);
+  const end = Math.max(t.lastIndexOf(']'), t.lastIndexOf('}'));
+  if (start >= 0 && end > start) t = t.slice(start, end + 1);
+  return t;
+}
+
 /** Llama a Gemini pidiendo salida JSON y la parsea. Reintenta ante errores
- * transitorios (429/500/503) con espera creciente. */
+ * transitorios (429/500/503) y ante JSON malformado. */
 export async function generateJson<T>(prompt: string): Promise<T> {
   const ai = getClient();
   const maxAttempts = 4;
@@ -36,13 +55,16 @@ export async function generateJson<T>(prompt: string): Promise<T> {
         contents: prompt,
         config: { responseMimeType: 'application/json' },
       });
-      return JSON.parse(res.text ?? '') as T;
+      return JSON.parse(cleanJson(res.text ?? '')) as T;
     } catch (err: unknown) {
       const status = (err as { status?: number })?.status;
-      const transient = status === 429 || status === 500 || status === 503;
-      if (!transient || attempt === maxAttempts) throw err;
-      const waitMs = attempt * 2000;
-      console.log(`  (Gemini ${status}, reintento ${attempt}/${maxAttempts - 1} en ${waitMs / 1000}s…)`);
+      const isParse = err instanceof SyntaxError;
+      const retryable = isParse || status === 429 || status === 500 || status === 503;
+      if (!retryable || attempt === maxAttempts) throw err;
+      const waitMs = isParse ? 500 : attempt * 2000;
+      console.log(
+        `  (${isParse ? 'JSON inválido' : `Gemini ${status}`}, reintento ${attempt}/${maxAttempts - 1}…)`,
+      );
       await sleep(waitMs);
     }
   }
