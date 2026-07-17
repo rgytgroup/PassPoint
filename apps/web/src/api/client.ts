@@ -84,4 +84,7 @@ export const api = {
   getReadiness: (code: string) => get<Readiness>(`/me/readiness/${code}`),
   /** ¿El usuario tiene acceso pagado a un estado? (requiere sesión, SPEC §5). */
   getAccess: (code: string) => get<{ access: boolean }>(`/me/access/${code}`),
+  /** Inicia el checkout de Stripe; devuelve la URL a la que redirigir (SPEC §4.7). */
+  startCheckout: (scope: 'STATE' | 'ALL', stateCode?: string) =>
+    post<{ url: string | null }>('/checkout', { scope, stateCode }),
 };

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
+import { useAuth } from '../auth/AuthContext';
+import { api } from '../api/client';
 import { PRICING } from '../data/pricing';
 
 interface PlanProps {
@@ -9,10 +11,11 @@ interface PlanProps {
   features: string[];
   cta: string;
   onBuy: () => void;
+  busy?: boolean;
   highlight?: boolean;
 }
 
-function Plan({ title, price, features, cta, onBuy, highlight }: PlanProps) {
+function Plan({ title, price, features, cta, onBuy, busy, highlight }: PlanProps) {
   return (
     <div
       className={`flex flex-col rounded-xl border p-6 ${
@@ -30,7 +33,8 @@ function Plan({ title, price, features, cta, onBuy, highlight }: PlanProps) {
       </ul>
       <button
         onClick={onBuy}
-        className="mt-6 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+        disabled={busy}
+        className="mt-6 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
       >
         {cta}
       </button>
@@ -40,18 +44,41 @@ function Plan({ title, price, features, cta, onBuy, highlight }: PlanProps) {
 
 export function Precios() {
   const { lang } = useLang();
+  const { email } = useAuth();
   const [params] = useSearchParams();
   const state = params.get('state')?.toUpperCase();
   const es = lang === 'ES';
   const [note, setNote] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  // El checkout real de Stripe se conecta en el siguiente paso.
-  const buy = () =>
-    setNote(
-      es
-        ? 'El pago se activará al conectar Stripe (siguiente paso). ¡Ya casi!'
-        : 'Payment will be enabled once Stripe is connected (next step). Almost there!',
-    );
+  async function buy(scope: 'STATE' | 'ALL') {
+    if (!email) {
+      setNote(es ? 'Inicia sesión para comprar.' : 'Sign in to purchase.');
+      return;
+    }
+    if (scope === 'STATE' && !state) {
+      setNote(
+        es
+          ? 'Abre un estado y pulsa "Ver precios" para comprarlo.'
+          : 'Open a state and tap "See pricing" to buy it.',
+      );
+      return;
+    }
+    setBusy(true);
+    setNote(null);
+    try {
+      const { url } = await api.startCheckout(scope, state?.toLowerCase());
+      if (url) window.location.href = url;
+      else throw new Error('sin url');
+    } catch {
+      setNote(
+        es
+          ? 'El pago aún no está disponible. Inténtalo más tarde.'
+          : 'Payment is not available yet. Please try later.',
+      );
+      setBusy(false);
+    }
+  }
 
   return (
     <section>
@@ -90,7 +117,8 @@ export function Precios() {
                 ]
           }
           cta={es ? 'Comprar' : 'Buy'}
-          onBuy={buy}
+          onBuy={() => buy('STATE')}
+          busy={busy}
         />
         <Plan
           highlight
@@ -110,7 +138,8 @@ export function Precios() {
                 ]
           }
           cta={es ? 'Comprar all-access' : 'Buy all-access'}
-          onBuy={buy}
+          onBuy={() => buy('ALL')}
+          busy={busy}
         />
       </div>
 

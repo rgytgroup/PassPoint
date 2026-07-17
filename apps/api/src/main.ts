@@ -3,10 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // rawBody: true expone req.rawBody (Buffer) para verificar la firma del
+  // webhook de Stripe, sin romper el parseo JSON del resto de rutas.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   const config = app.get(ConfigService);
 
-  // El webhook de Stripe necesita el cuerpo crudo; se habilitará al montar ese módulo.
   app.enableCors({ origin: config.get<string>('APP_BASE_URL') ?? true });
   app.setGlobalPrefix('api');
 
