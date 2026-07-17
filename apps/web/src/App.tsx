@@ -4,6 +4,7 @@ import { Home } from './pages/Home';
 import { StateHub } from './pages/StateHub';
 import { Practice } from './pages/Practice';
 import { Mock } from './pages/Mock';
+import { Login } from './pages/Login';
 import { Placeholder } from './pages/Placeholder';
 
 // Rutas del SPEC §4. Las páginas marcadas como Placeholder se implementan
@@ -13,6 +14,7 @@ export function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/entrar" element={<Login />} />
         <Route path="/precios" element={<Placeholder title="Precios" spec="SPEC §4.7" />} />
         <Route path="/repaso" element={<Placeholder title="Repaso de falladas" spec="SPEC §4.6" />} />
 

@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
+import { useAuth } from '../auth/AuthContext';
 import { api } from '../api/client';
 import { useAsync } from '../api/useAsync';
 
 export function Practice() {
   const { state: code = '', topic: slug = '' } = useParams();
   const { t, pick } = useLang();
+  const { email } = useAuth();
   const { data: questions, loading, error } = useAsync(
     () => api.getTopicQuestions(code, slug),
     [code, slug],
@@ -16,6 +18,9 @@ export function Practice() {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [finished, setFinished] = useState(false);
+  // Registro de respuestas para persistir el intento (SPEC §3).
+  const answersLog = useRef<{ questionId: string; chosenIndex: number }[]>([]);
+  const savedRef = useRef(false);
 
   // Reinicia el estado al cambiar de tema.
   useEffect(() => {
@@ -23,7 +28,22 @@ export function Practice() {
     setSelectedIdx(null);
     setCorrectCount(0);
     setFinished(false);
+    answersLog.current = [];
+    savedRef.current = false;
   }, [code, slug]);
+
+  // Al terminar, guarda el intento si hay sesión (una sola vez).
+  useEffect(() => {
+    if (!finished || !email || savedRef.current) return;
+    savedRef.current = true;
+    api
+      .saveAttempt({
+        stateCode: code,
+        mode: 'PRACTICE',
+        answers: answersLog.current,
+      })
+      .catch((e) => console.error('No se pudo guardar el intento:', e));
+  }, [finished, email, code]);
 
   if (loading) return <p className="text-slate-500">Cargando…</p>;
   if (error) {
@@ -55,6 +75,9 @@ export function Practice() {
         <h1 className="text-2xl font-bold text-slate-900">
           {correctCount} / {questions.length} correctas ({pct}%)
         </h1>
+        {email && (
+          <p className="mt-2 text-sm text-green-700">✓ Progreso guardado</p>
+        )}
         <div className="mt-6 flex justify-center gap-3">
           <button
             onClick={() => {
@@ -84,6 +107,7 @@ export function Practice() {
   function choose(optionIdx: number) {
     if (revealed) return;
     setSelectedIdx(optionIdx);
+    answersLog.current.push({ questionId: question.id, chosenIndex: optionIdx });
     if (question.options[optionIdx].correct) {
       setCorrectCount((c) => c + 1);
     }

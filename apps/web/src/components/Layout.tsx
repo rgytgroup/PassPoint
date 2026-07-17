@@ -1,8 +1,10 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
+import { useAuth } from '../auth/AuthContext';
 
 export function Layout() {
   const { t, toggle } = useLang();
+  const { configured, email } = useAuth();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -11,13 +13,32 @@ export function Layout() {
           <Link to="/" className="text-lg font-bold text-slate-900">
             {t('appName')}
           </Link>
-          <button
-            onClick={toggle}
-            className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium hover:bg-slate-100"
-            aria-label="Cambiar idioma / Switch language"
-          >
-            {t('langToggle')}
-          </button>
+          <div className="flex items-center gap-2">
+            {configured &&
+              (email ? (
+                <Link
+                  to="/entrar"
+                  className="max-w-[10rem] truncate rounded-md px-2 py-1 text-sm text-slate-600 hover:bg-slate-100"
+                  title={email}
+                >
+                  {email}
+                </Link>
+              ) : (
+                <Link
+                  to="/entrar"
+                  className="rounded-md px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  Entrar
+                </Link>
+              ))}
+            <button
+              onClick={toggle}
+              className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium hover:bg-slate-100"
+              aria-label="Cambiar idioma / Switch language"
+            >
+              {t('langToggle')}
+            </button>
+          </div>
         </div>
       </header>
 

@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
+import { useAuth } from '../auth/AuthContext';
 import { api } from '../api/client';
 import { useAsync } from '../api/useAsync';
 import type { MockQuestion } from '../api/types';
@@ -16,7 +17,9 @@ function formatTime(seconds: number): string {
 export function Mock() {
   const { state: code = '' } = useParams();
   const { t, pick } = useLang();
+  const { email } = useAuth();
   const [attempt, setAttempt] = useState(0);
+  const savedRef = useRef(false);
   const { data: mock, loading, error } = useAsync(
     () => api.getMock(code),
     [code, attempt],
@@ -37,8 +40,25 @@ export function Mock() {
     setAnswers({});
     setSubmitted(false);
     setReviewing(false);
+    savedRef.current = false;
     setTimeLeft((mock?.questions.length ?? 0) * SECONDS_PER_QUESTION);
   }, [mock]);
+
+  // Al entregar, guarda el intento si hay sesión (una sola vez).
+  useEffect(() => {
+    if (!submitted || !mock || !email || savedRef.current) return;
+    savedRef.current = true;
+    api
+      .saveAttempt({
+        stateCode: mock.state.code,
+        mode: 'MOCK',
+        answers: Object.entries(answers).map(([questionId, chosenIndex]) => ({
+          questionId,
+          chosenIndex,
+        })),
+      })
+      .catch((e) => console.error('No se pudo guardar el simulacro:', e));
+  }, [submitted, mock, email, answers]);
 
   // Cronómetro: auto-entrega al llegar a 0.
   useEffect(() => {
@@ -228,6 +248,11 @@ export function Mock() {
             En el examen real: {mock.state.passThreshold} de{' '}
             {mock.state.examQuestionCount} para aprobar.
           </p>
+          {email && (
+            <p className="mt-2 text-xs font-medium text-green-700">
+              ✓ Resultado guardado en tu progreso
+            </p>
+          )}
         </div>
 
         <h2 className="mt-8 text-lg font-semibold text-slate-700">

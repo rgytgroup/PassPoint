@@ -6,12 +6,16 @@ import { StatesModule } from './states/states.module';
 import { QuestionsModule } from './questions/questions.module';
 import { AttemptsModule } from './attempts/attempts.module';
 import { EntitlementsModule } from './entitlements/entitlements.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     // Módulos por dominio (CLAUDE.md → Estilo técnico)
+    UsersModule,
+    AuthModule,
     StatesModule,
     QuestionsModule,
     AttemptsModule,
