@@ -1,0 +1,40 @@
+[
+  {
+    "topicSlug": "estacionamiento",
+    "topicNameEs": "Estacionamiento",
+    "topicNameEn": "Parking",
+    "topicOrder": 3,
+    "textEn": "What does a red painted curb mean in California?",
+    "textEs": "¿Qué significa un borde de acera pintado de rojo en California?",
+    "options": [
+      { "textEn": "No stopping, standing or parking", "textEs": "Prohibido parar, detenerse o estacionar", "correct": true },
+      { "textEn": "Parking allowed for 15 minutes", "textEs": "Estacionamiento permitido por 15 minutos", "correct": false },
+      { "textEn": "Loading zone for passengers", "textEs": "Zona de carga para pasajeros", "correct": false }
+    ],
+    "explanationEn": "A red curb means no stopping, standing, or parking at any time.",
+    "explanationEs": "Un borde rojo significa que no se puede parar, detenerse ni estacionar en ningún momento.",
+    "manualRef": "Estacionamiento — Colores de bordes de acera",
+    "difficulty": 1,
+    "isFree": false,
+    "status": "DRAFT"
+  },
+  {
+    "topicSlug": "estacionamiento",
+    "topicNameEs": "Estacionamiento",
+    "topicNameEn": "Parking",
+    "topicOrder": 3,
+    "textEn": "When parking uphill next to a curb, which way should you turn your front wheels?",
+    "textEs": "Al estacionar cuesta arriba junto a una acera, ¿hacia dónde debe girar las ruedas delanteras?",
+    "options": [
+      { "textEn": "Away from the curb", "textEs": "Hacia afuera de la acera", "correct": true },
+      { "textEn": "Toward the curb", "textEs": "Hacia la acera", "correct": false },
+      { "textEn": "Straight ahead", "textEs": "Rectas hacia el frente", "correct": false }
+    ],
+    "explanationEn": "Uphill with a curb, turn wheels away from the curb so the car rolls into it if it moves.",
+    "explanationEs": "Cuesta arriba con acera, gire las ruedas hacia afuera para que el auto se detenga contra la acera si se mueve.",
+    "manualRef": "Estacionamiento — En pendientes",
+    "difficulty": 2,
+    "isFree": false,
+    "status": "DRAFT"
+  }
+]
