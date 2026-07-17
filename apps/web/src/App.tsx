@@ -4,6 +4,7 @@ import { Home } from './pages/Home';
 import { StateHub } from './pages/StateHub';
 import { Practice } from './pages/Practice';
 import { Mock } from './pages/Mock';
+import { Signs } from './pages/Signs';
 import { Login } from './pages/Login';
 import { Placeholder } from './pages/Placeholder';
 
@@ -22,7 +23,7 @@ export function App() {
         <Route path="/:state" element={<StateHub />} />
         <Route path="/:state/practica/:topic" element={<Practice />} />
         <Route path="/:state/simulacro" element={<Mock />} />
-        <Route path="/:state/senales" element={<Placeholder title="Señales" spec="SPEC §4.5" />} />
+        <Route path="/:state/senales" element={<Signs />} />
 
         {/* SEO (SSG) — SPEC §4.8 */}
         <Route
