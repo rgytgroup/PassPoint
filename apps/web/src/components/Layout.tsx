@@ -1,13 +1,22 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useLang } from '../i18n/LangContext';
 import { useAuth } from '../auth/AuthContext';
+import { useOnlineStatus } from '../hooks/useOnlineStatus';
 
 export function Layout() {
-  const { t, toggle } = useLang();
+  const { t, lang, toggle } = useLang();
   const { configured, email } = useAuth();
+  const online = useOnlineStatus();
 
   return (
     <div className="flex min-h-screen flex-col">
+      {!online && (
+        <div className="bg-amber-500 px-4 py-1 text-center text-sm font-medium text-white">
+          {lang === 'ES'
+            ? 'Sin conexión — usando tu contenido descargado.'
+            : 'Offline — using your downloaded content.'}
+        </div>
+      )}
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <Link to="/" className="text-lg font-bold text-slate-900">

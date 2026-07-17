@@ -87,4 +87,22 @@ export const api = {
   /** Inicia el checkout de Stripe; devuelve la URL a la que redirigir (SPEC §4.7). */
   startCheckout: (scope: 'STATE' | 'ALL', stateCode?: string) =>
     post<{ url: string | null }>('/checkout', { scope, stateCode }),
+  /**
+   * Precachea el banco completo del estado para uso sin conexión (SPEC §5):
+   * al recorrer estos GET, el service worker (NetworkFirst) guarda las
+   * respuestas en caché, quedando disponibles offline.
+   */
+  prefetchOfflineBank: async (code: string) => {
+    const state = await get<StateDetail | null>(`/states/${code}`);
+    if (!state) return { topics: 0, questions: 0 };
+    let questions = 0;
+    for (const topic of state.topics) {
+      const qs = await get<Question[]>(
+        `/states/${code}/topics/${topic.slug}/questions`,
+      );
+      questions += qs.length;
+    }
+    await get<MockExam>(`/states/${code}/mock`).catch(() => undefined);
+    return { topics: state.topics.length, questions };
+  },
 };

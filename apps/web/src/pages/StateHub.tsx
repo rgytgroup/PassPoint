@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import { useAsync } from '../api/useAsync';
 import { ReadinessCard } from '../components/ReadinessCard';
 import { AccessBanner } from '../components/AccessBanner';
+import { OfflineDownload } from '../components/OfflineDownload';
 
 export function StateHub() {
   const { state: code = '' } = useParams();
@@ -51,6 +52,7 @@ export function StateHub() {
       </p>
 
       <AccessBanner code={code} />
+      <OfflineDownload code={code} />
       <ReadinessCard code={code} />
 
       <div className="mt-6 flex flex-wrap gap-3">

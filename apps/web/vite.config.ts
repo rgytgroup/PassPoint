@@ -24,10 +24,51 @@ export default defineConfig({
         start_url: '/',
         icons: [],
       },
+      workbox: {
+        // Offline del contenido comprado (SPEC §5).
+        runtimeCaching: [
+          {
+            // Banco del estado (temas y preguntas): red primero, con
+            // respaldo en caché para funcionar sin conexión.
+            urlPattern: /\/api\/states\//,
+            handler: 'NetworkFirst',
+            method: 'GET',
+            options: {
+              cacheName: 'passpoint-api',
+              networkTimeoutSeconds: 5,
+              expiration: {
+                maxEntries: 300,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 días
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // Intentos: si se está offline, se encolan y se reenvían al
+            // reconectar (Background Sync).
+            urlPattern: /\/api\/attempts$/,
+            handler: 'NetworkOnly',
+            method: 'POST',
+            options: {
+              backgroundSync: {
+                name: 'passpoint-attempts',
+                options: { maxRetentionTime: 60 * 24 }, // 24 h en minutos
+              },
+            },
+          },
+        ],
+      },
     }),
   ],
   server: {
     port: 5173,
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
+  },
+  // El preview también proxea /api para poder probar el offline localmente.
+  preview: {
+    port: 4173,
     proxy: {
       '/api': 'http://localhost:3000',
     },
