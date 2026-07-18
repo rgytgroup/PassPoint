@@ -24,9 +24,22 @@ export async function run(args: string[]): Promise<void> {
     return;
   }
 
+  // Ordena por la recomendación del pre-filtro: las marcadas primero
+  // (RECHAZAR, luego REVISAR), y al final las limpias (APROBAR) para ráfaga.
+  const RANK: Record<string, number> = { RECHAZAR: 0, REVISAR: 1, APROBAR: 2 };
+  const recOf = (q: (typeof pending)[number]) =>
+    (q.aiReview as { recommendation?: string } | null)?.recommendation;
+  pending.sort((a, b) => (RANK[recOf(a) ?? ''] ?? 3) - (RANK[recOf(b) ?? ''] ?? 3));
+
+  const flagged = pending.filter((q) => {
+    const r = recOf(q);
+    return r === 'RECHAZAR' || r === 'REVISAR';
+  }).length;
+
   console.log(
-    `${pending.length} preguntas pendientes en ${stateCode}.\n` +
-      '  [a] aprobar  ·  [r] rechazar (elimina)  ·  [s] saltar  ·  [q] salir\n',
+    `${pending.length} preguntas pendientes en ${stateCode}` +
+      (flagged ? ` (${flagged} marcadas por el pre-filtro van primero)` : '') +
+      '.\n  [a] aprobar  ·  [r] rechazar (elimina)  ·  [s] saltar  ·  [q] salir\n',
   );
 
   const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -52,10 +65,21 @@ export async function run(args: string[]): Promise<void> {
   let rejected = 0;
   let skipped = 0;
 
+  const ICON: Record<string, string> = { RECHAZAR: '❌', REVISAR: '⚠️', APROBAR: '✅' };
+
   for (const q of pending) {
     const opts = q.options as { textEs: string; correct: boolean }[];
+    const ai = q.aiReview as
+      | { recommendation?: string; issues?: string[] }
+      | null;
     console.log('─'.repeat(64));
     console.log(`Tema: ${q.topic.nameEs} · ${q.status} · manualRef: ${q.manualRef}`);
+    if (ai?.recommendation) {
+      console.log(
+        `🤖 Pre-filtro: ${ICON[ai.recommendation] ?? ''} ${ai.recommendation}`,
+      );
+      (ai.issues ?? []).forEach((i) => console.log(`   · ${i}`));
+    }
     console.log(`\n  ${q.textEs}`);
     opts.forEach((o, i) =>
       console.log(`    ${i + 1}. ${o.textEs} ${o.correct ? '✓' : ''}`),

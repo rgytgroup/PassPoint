@@ -87,6 +87,8 @@ model Question {
   status         QuestionStatus @default(DRAFT)
   version        Int            @default(1)
   isFree         Boolean        @default(false) // parte del set gratis (SPEC §5)
+  /// Recomendación del pre-filtro IA (advisory, no decide): { recommendation, issues }
+  aiReview       Json?
 
   topic     Topic              @relation(fields: [topicId], references: [id], onDelete: Cascade)
   userStats UserQuestionStat[]

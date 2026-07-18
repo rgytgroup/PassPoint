@@ -1,6 +1,6 @@
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { QuestionStatus } from '@prisma/client';
+import { QuestionStatus, Prisma } from '@prisma/client';
 import { prisma } from '../db.js';
 import { generateJson, isGeminiConfigured } from '../gemini.js';
 import { requireState } from '../util/args.js';
@@ -14,9 +14,10 @@ interface Assessment {
 const ORDER = { RECHAZAR: 0, REVISAR: 1, APROBAR: 2 };
 const ICON = { RECHAZAR: '❌', REVISAR: '⚠️ ', APROBAR: '✅' };
 
-// Pre-filtro con IA: analiza críticamente las preguntas pendientes y produce un
-// reporte priorizado para que la revisión HUMANA sea rápida. NO toca la DB:
-// el humano sigue dando el visto bueno final con `review` (SPEC §6.4).
+// Pre-filtro con IA: analiza críticamente las preguntas pendientes, guarda su
+// recomendación (advisory, en Question.aiReview) y produce un reporte
+// priorizado para que la revisión HUMANA sea rápida. NO cambia el status: el
+// humano sigue dando el visto bueno final con `review` (SPEC §6.4).
 export async function run(args: string[]): Promise<void> {
   const stateCode = requireState(args);
   if (!isGeminiConfigured()) {
@@ -56,6 +57,11 @@ export async function run(args: string[]): Promise<void> {
     } catch {
       a = { recommendation: 'REVISAR', confidence: 'baja', issues: ['no se pudo analizar; revisar a mano'] };
     }
+    // Guarda la recomendación como metadato advisory (no cambia el status).
+    await prisma.question.update({
+      where: { id: q.id },
+      data: { aiReview: a as unknown as Prisma.InputJsonValue },
+    });
     rows.push({ q, a });
   }
 
