@@ -36,7 +36,37 @@ interface Gen {
   explanationEn: string;
   explanationEs: string;
   manualRef: string;
-  difficulty?: number;
+  difficulty?: number | string;
+}
+
+/** Normaliza la dificultad a 1–3 (Gemini a veces manda "medium", "2", etc.). */
+function toDifficulty(v: unknown): number {
+  if (typeof v === 'number' && v >= 1 && v <= 3) return Math.round(v);
+  if (typeof v === 'string') {
+    const map: Record<string, number> = {
+      easy: 1, facil: 1, baja: 1, low: 1,
+      medium: 2, media: 2, medio: 2,
+      hard: 3, dificil: 3, alta: 3, high: 3,
+    };
+    const key = v.trim().toLowerCase();
+    if (map[key]) return map[key];
+    const n = parseInt(key, 10);
+    if (n >= 1 && n <= 3) return n;
+  }
+  return 1;
+}
+
+/** Valida que una pregunta generada tenga la forma mínima esperada. */
+function isValid(q: Gen): boolean {
+  return (
+    !!q &&
+    typeof q.textEs === 'string' &&
+    typeof q.textEn === 'string' &&
+    Array.isArray(q.options) &&
+    q.options.length >= 2 &&
+    q.options.some((o) => o?.correct === true) &&
+    typeof q.manualRef === 'string'
+  );
 }
 
 // Genera todo el banco desde los chunks del manual oficial: por cada chunk,
@@ -92,42 +122,49 @@ export async function run(args: string[]): Promise<void> {
     }
     if (!Array.isArray(items) || items.length === 0) continue;
 
+    let added = 0;
     for (const q of items) {
+      if (!isValid(q)) continue;
       const slug = TOPICS[q.topicSlug] ? q.topicSlug : 'normas';
-      let topicId = topicCache.get(slug);
-      if (!topicId) {
-        const t = await prisma.topic.upsert({
-          where: { stateId_slug: { stateId: state.id, slug } },
-          update: {},
-          create: {
-            stateId: state.id,
-            slug,
-            nameEs: TOPICS[slug].es,
-            nameEn: TOPICS[slug].en,
-            order: TOPICS[slug].order,
+      try {
+        let topicId = topicCache.get(slug);
+        if (!topicId) {
+          const t = await prisma.topic.upsert({
+            where: { stateId_slug: { stateId: state.id, slug } },
+            update: {},
+            create: {
+              stateId: state.id,
+              slug,
+              nameEs: TOPICS[slug].es,
+              nameEn: TOPICS[slug].en,
+              order: TOPICS[slug].order,
+            },
+          });
+          topicId = t.id;
+          topicCache.set(slug, topicId);
+        }
+        await prisma.question.create({
+          data: {
+            topicId,
+            textEn: q.textEn,
+            textEs: q.textEs,
+            options: q.options as unknown as Prisma.InputJsonValue,
+            explanationEn: q.explanationEn,
+            explanationEs: q.explanationEs,
+            manualRef: q.manualRef,
+            difficulty: toDifficulty(q.difficulty),
+            isFree: false,
+            status: QuestionStatus.DRAFT,
           },
         });
-        topicId = t.id;
-        topicCache.set(slug, topicId);
+        created++;
+        added++;
+        perTopic[slug] = (perTopic[slug] ?? 0) + 1;
+      } catch {
+        // Pregunta con forma inválida: se salta, no tumba el run.
       }
-      await prisma.question.create({
-        data: {
-          topicId,
-          textEn: q.textEn,
-          textEs: q.textEs,
-          options: q.options as unknown as Prisma.InputJsonValue,
-          explanationEn: q.explanationEn,
-          explanationEs: q.explanationEs,
-          manualRef: q.manualRef,
-          difficulty: q.difficulty ?? 1,
-          isFree: false,
-          status: QuestionStatus.DRAFT,
-        },
-      });
-      created++;
-      perTopic[slug] = (perTopic[slug] ?? 0) + 1;
     }
-    console.log(`  chunk ${i + 1}/${files.length}: +${items.length} (total ${created})`);
+    console.log(`  chunk ${i + 1}/${files.length}: +${added} (total ${created})`);
   }
 
   console.log(`\n[autogen] ${created} preguntas DRAFT desde el manual de ${stateCode}.`);
