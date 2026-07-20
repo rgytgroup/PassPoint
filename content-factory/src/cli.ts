@@ -5,6 +5,7 @@
 
 import { run as ingest } from './commands/ingest.js';
 import { run as generate } from './commands/generate.js';
+import { run as autogen } from './commands/autogen.js';
 import { run as verify } from './commands/verify.js';
 import { run as prefilter } from './commands/prefilter.js';
 import { run as review } from './commands/review.js';
@@ -16,6 +17,7 @@ type Command = (args: string[]) => Promise<void>;
 const COMMANDS: Record<string, { run: Command; help: string }> = {
   ingest: { run: ingest, help: 'Descarga y parsea el manual oficial → chunks con referencia de sección.' },
   generate: { run: generate, help: 'Genera preguntas por tema ancladas a un chunk → DRAFT.' },
+  autogen: { run: autogen, help: 'Genera todo el banco desde los chunks del manual (clasifica tema + genera) → DRAFT.' },
   verify: { run: verify, help: 'Segundo pase de IA valida cada DRAFT contra su fuente → AI_VERIFIED.' },
   prefilter: { run: prefilter, help: 'Pre-filtro IA: reporte priorizado de pendientes para acelerar la revisión humana.' },
   review: { run: review, help: 'Revisión humana 1×1 (aprobar/editar/rechazar) → HUMAN_APPROVED.' },
