@@ -58,10 +58,19 @@ export async function generateJson<T>(prompt: string): Promise<T> {
       return JSON.parse(cleanJson(res.text ?? '')) as T;
     } catch (err: unknown) {
       const status = (err as { status?: number })?.status;
+      const msg = String((err as { message?: string })?.message ?? err);
       const isParse = err instanceof SyntaxError;
-      const retryable = isParse || status === 429 || status === 500 || status === 503;
+      // Créditos/facturación agotados: reintentar no sirve, aborta con mensaje claro.
+      if (!isParse && /credit|depleted|prepay|billing/i.test(msg)) {
+        throw new Error(
+          'Gemini sin créditos: recarga en AI Studio → Billing (https://ai.studio/projects).',
+        );
+      }
+      const isRate = status === 429; // rate-limit transitorio
+      const retryable = isParse || isRate || status === 500 || status === 503;
       if (!retryable || attempt === maxAttempts) throw err;
-      const waitMs = isParse ? 500 : attempt * 2000;
+      // El rate-limit necesita esperas más largas para liberarse.
+      const waitMs = isParse ? 500 : isRate ? attempt * 6000 : attempt * 2000;
       console.log(
         `  (${isParse ? 'JSON inválido' : `Gemini ${status}`}, reintento ${attempt}/${maxAttempts - 1}…)`,
       );
