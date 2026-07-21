@@ -38,3 +38,6 @@ Thumbs.db
 *.swp
 .vscode/*
 !.vscode/extensions.json
+
+# Manuales PDF descargados (no versionar)
+content-factory/*.pdf
