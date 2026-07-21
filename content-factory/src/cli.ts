@@ -9,6 +9,7 @@ import { run as autogen } from './commands/autogen.js';
 import { run as verify } from './commands/verify.js';
 import { run as prefilter } from './commands/prefilter.js';
 import { run as flagged } from './commands/flagged.js';
+import { run as dedup } from './commands/dedup.js';
 import { run as review } from './commands/review.js';
 import { run as importCmd } from './commands/import.js';
 import { run as watch } from './commands/watch.js';
@@ -22,6 +23,7 @@ const COMMANDS: Record<string, { run: Command; help: string }> = {
   verify: { run: verify, help: 'Segundo pase de IA valida cada DRAFT contra su fuente → AI_VERIFIED.' },
   prefilter: { run: prefilter, help: 'Pre-filtro IA: reporte priorizado de pendientes para acelerar la revisión humana.' },
   flagged: { run: flagged, help: 'Reporte de las marcadas (revisar/rechazar) junto al pasaje del manual, para decidir.' },
+  dedup: { run: dedup, help: 'Detecta preguntas pendientes casi duplicadas y las elimina (--apply).' },
   review: { run: review, help: 'Revisión humana 1×1 (aprobar/editar/rechazar) → HUMAN_APPROVED.' },
   import: { run: importCmd, help: 'Carga a la base de datos con versión.' },
   watch: { run: watch, help: 'Vigila cambios del manual oficial y alerta para regenerar.' },
