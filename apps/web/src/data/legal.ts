@@ -7,7 +7,7 @@ export const LEGAL = {
   // TODO(dueño): confirmar dominio/correo real de soporte antes del lanzamiento.
   supportEmail: 'soporte@passpoint.app',
   // Ventana de reembolso para la compra digital única (días).
-  refundDays: 14,
+  refundDays: 7,
   // Fecha de última actualización de los documentos (ISO).
   lastUpdated: '2026-07-24',
 };
