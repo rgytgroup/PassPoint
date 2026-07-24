@@ -12,12 +12,16 @@ import { Login } from './pages/Login';
 import { Perfil } from './pages/Perfil';
 import { Terminos, Privacidad, Reembolsos } from './pages/Legal';
 import { Placeholder } from './pages/Placeholder';
+import { ProtoDashboard } from './proto/ProtoDashboard';
 
 // Rutas del SPEC §4. Las páginas marcadas como Placeholder se implementan
 // en fases posteriores; el árbol de rutas ya refleja la estructura final.
 export function App() {
   return (
     <Routes>
+      {/* Prueba de fidelidad al prototipo (mock aislado, fuera del Layout web). */}
+      <Route path="/proto" element={<ProtoDashboard />} />
+
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/entrar" element={<Login />} />
