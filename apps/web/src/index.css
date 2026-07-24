@@ -53,3 +53,30 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Confeti de la pantalla de resultados (SPEC §11.4) — CSS puro, sin librerías. */
+@keyframes ppConfettiFall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+.pp-confetti-piece {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  animation-name: ppConfettiFall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pp-confetti-piece {
+    display: none;
+  }
+}

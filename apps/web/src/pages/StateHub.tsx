@@ -5,9 +5,12 @@ import { api } from '../api/client';
 import { useAsync } from '../api/useAsync';
 import { AccessBanner } from '../components/AccessBanner';
 import { OfflineDownload } from '../components/OfflineDownload';
+import { GamificationStrip } from '../components/GamificationStrip';
+import { SmartStudyCard } from '../components/SmartStudyCard';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { RingGauge } from '../ui/RingGauge';
+import type { TopicMastery } from '../api/types';
 
 function readyMessage(percent: number, seen: number, es: boolean): string {
   if (seen === 0)
@@ -16,6 +19,39 @@ function readyMessage(percent: number, seen: number, es: boolean): string {
   if (percent >= 60) return es ? 'Casi listo — sigue así.' : 'Almost ready — keep going.';
   if (percent >= 35) return es ? 'Buen avance, sigue practicando.' : 'Good progress, keep practicing.';
   return es ? 'Vas empezando — practica más temas.' : 'Just getting started — practice more.';
+}
+
+/** Fila de tema con su barra de dominio (SPEC §11.2 dominio por tema). */
+function TopicRow({
+  code,
+  topic,
+  es,
+  name,
+}: {
+  code: string;
+  topic: TopicMastery;
+  es: boolean;
+  name: string;
+}) {
+  const barColor = topic.mastery >= 80 ? 'bg-success' : topic.weak ? 'bg-warning' : 'bg-primary';
+  return (
+    <Link to={`/${code}/practica/${topic.slug}`}>
+      <Card className="p-4 transition-shadow hover:shadow-md">
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-semibold text-text-primary">{name}</span>
+          <span className="text-sm font-semibold text-text-secondary">{topic.mastery}%</span>
+        </div>
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border">
+          <div className={`h-full rounded-full ${barColor}`} style={{ width: `${topic.mastery}%` }} />
+        </div>
+        {topic.weak && topic.seen > 0 && (
+          <p className="mt-2 text-xs font-medium text-warning">
+            {es ? 'Tema débil — dale prioridad' : 'Weak topic — prioritize it'}
+          </p>
+        )}
+      </Card>
+    </Link>
+  );
 }
 
 export function StateHub() {
@@ -28,6 +64,14 @@ export function StateHub() {
   const { data: readiness } = useAsync(
     () => (email ? api.getReadiness(code) : Promise.resolve(null)),
     [email, code],
+  );
+  const { data: study } = useAsync(
+    () => (email ? api.getStudy(code) : Promise.resolve(null)),
+    [email, code],
+  );
+  const { data: game } = useAsync(
+    () => (email ? api.getGamification(lang) : Promise.resolve(null)),
+    [email, lang],
   );
 
   if (loading) return <p className="text-text-secondary">Cargando…</p>;
@@ -49,6 +93,9 @@ export function StateHub() {
         </p>
       </section>
     );
+
+  // Mapa slug → dominio para pintar barras; si no hay sesión, sin datos.
+  const masteryBySlug = new Map((study?.topicMastery ?? []).map((m) => [m.slug, m]));
 
   return (
     <section>
@@ -77,6 +124,12 @@ export function StateHub() {
         </Card>
       )}
 
+      {/* Gamificación (SPEC §11.3) */}
+      {email && game && <GamificationStrip data={game} />}
+
+      {/* Plan de hoy (SPEC §11.1) */}
+      {email && study && <SmartStudyCard code={code} study={study} />}
+
       <AccessBanner code={code} />
       <OfflineDownload code={code} />
 
@@ -94,19 +147,27 @@ export function StateHub() {
         </Link>
       </div>
 
-      {/* Temas / práctica */}
+      {/* Temas / práctica con dominio por tema */}
       <h2 className="mt-8 text-lg font-bold text-text-primary">{t('practice')}</h2>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-        {state.topics.map((topic) => (
-          <li key={topic.id}>
-            <Link to={`/${code}/practica/${topic.slug}`}>
-              <Card className="flex items-center justify-between p-4 transition-shadow hover:shadow-md">
-                <span className="font-semibold text-text-primary">{pick(topic, 'name')}</span>
-                <span className="text-primary">→</span>
-              </Card>
-            </Link>
-          </li>
-        ))}
+        {state.topics.map((topic) => {
+          const mastery = masteryBySlug.get(topic.slug);
+          const name = pick(topic, 'name');
+          return (
+            <li key={topic.id}>
+              {mastery ? (
+                <TopicRow code={code} topic={mastery} es={es} name={name} />
+              ) : (
+                <Link to={`/${code}/practica/${topic.slug}`}>
+                  <Card className="flex items-center justify-between p-4 transition-shadow hover:shadow-md">
+                    <span className="font-semibold text-text-primary">{name}</span>
+                    <span className="text-primary">→</span>
+                  </Card>
+                </Link>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

@@ -3,6 +3,7 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { StateHub } from './pages/StateHub';
 import { Practice } from './pages/Practice';
+import { SmartStudy } from './pages/SmartStudy';
 import { Mock } from './pages/Mock';
 import { Signs } from './pages/Signs';
 import { Repaso } from './pages/Repaso';
@@ -24,6 +25,7 @@ export function App() {
         {/* Estado y sus módulos */}
         <Route path="/:state" element={<StateHub />} />
         <Route path="/:state/practica/:topic" element={<Practice />} />
+        <Route path="/:state/smart" element={<SmartStudy />} />
         <Route path="/:state/simulacro" element={<Mock />} />
         <Route path="/:state/senales" element={<Signs />} />
 
