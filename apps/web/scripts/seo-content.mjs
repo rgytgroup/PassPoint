@@ -2,10 +2,16 @@
 // Español (el objetivo es "examen de manejo en español"). Redacción original.
 // El sitio bilingüe/interactivo vive en la SPA; estas páginas son el imán SEO.
 
+// Dominio de producción para canonical/sitemap.
+// Prioridad: SITE_URL (dominio propio) → URL de producción que inyecta Vercel
+// automáticamente (VERCEL_PROJECT_PRODUCTION_URL, sin protocolo) → local.
+const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : undefined;
+
 export const site = {
   name: 'PassPoint',
-  // Dominio de producción para canonical/sitemap. Configúralo con SITE_URL.
-  url: process.env.SITE_URL || 'http://localhost:4173',
+  url: process.env.SITE_URL || vercelUrl || 'http://localhost:4173',
   disclaimer:
     'PassPoint es una aplicación independiente, no afiliada a ningún DMV ni entidad gubernamental.',
 };
