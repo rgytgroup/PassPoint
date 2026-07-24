@@ -12,7 +12,9 @@ import type {
 
 // En dev, Vite hace proxy de /api → http://localhost:3000 (ver vite.config.ts).
 // En prod se sirve desde el mismo origen o VITE_API_BASE.
-const API_BASE = import.meta.env.VITE_API_BASE ?? '';
+// Se recorta cualquier "/" final para no generar rutas con doble barra
+// (p. ej. ".../app//api/states" → 404) si VITE_API_BASE trae slash al final.
+const API_BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/+$/, '');
 
 // Token de acceso de Supabase, inyectado por AuthContext al iniciar/cerrar sesión.
 let authToken: string | null = null;
