@@ -8,7 +8,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
   const config = app.get(ConfigService);
 
-  app.enableCors({ origin: config.get<string>('APP_BASE_URL') ?? true });
+  // CORS: el origen debe coincidir EXACTO con el que envía el navegador (sin
+  // barra final ni path). Se normaliza APP_BASE_URL quitando "/" al final para
+  // evitar bloqueos por un simple slash. Si no está definido, se permite todo.
+  const appOrigin = config.get<string>('APP_BASE_URL')?.replace(/\/+$/, '');
+  app.enableCors({ origin: appOrigin || true });
   app.setGlobalPrefix('api');
 
   const port = config.get<number>('PORT') ?? 3000;
