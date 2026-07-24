@@ -7,6 +7,7 @@ import { useAsync } from '../api/useAsync';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Confetti } from '../ui/Confetti';
+import { ic, Line } from '../ui/icons';
 import type { MockQuestion } from '../api/types';
 
 const SECONDS_PER_QUESTION = 60;
@@ -216,27 +217,59 @@ export function Mock() {
   if (submitted && results) {
     const timeUsed = totalTime - timeLeft;
     const pct = results.total > 0 ? Math.round((results.correct / results.total) * 100) : 0;
+    const incorrect = results.total - results.correct;
     return (
-      <section>
+      <section className="mx-auto max-w-2xl">
         {results.passed && <Confetti />}
-        <div className="rounded-3xl bg-background-dark px-6 py-10 text-center text-text-on-dark">
-          <p className="text-6xl">{results.passed ? '🎉' : '💪'}</p>
-          <h1 className="mt-3 text-3xl font-extrabold">
-            {results.passed ? (es ? '¡Aprobado!' : 'Passed!') : es ? 'No aprobado' : 'Not passed'}
+        <div className="overflow-hidden rounded-3xl bg-background-dark px-6 py-10 text-center text-text-on-dark">
+          {/* Ícono de resultado */}
+          <span
+            className={`mx-auto grid h-16 w-16 place-items-center rounded-full ${
+              results.passed ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'
+            }`}
+          >
+            <Line d={results.passed ? ic.check : ic.bell} cls="h-8 w-8" />
+          </span>
+          <h1 className="mt-4 text-3xl font-extrabold">
+            {results.passed ? (es ? '¡Aprobado!' : 'Great job!') : es ? 'Sigue practicando' : 'Keep practicing'}
           </h1>
-          <p className="mt-4 text-5xl font-extrabold">
+          <p className="mt-1 text-sm text-text-on-dark/70">
+            {results.passed
+              ? es
+                ? 'Estás listo para el examen real.'
+                : "You're ready for the real test."
+              : es
+                ? 'Ya casi. Repasa y vuelve a intentar.'
+                : 'Almost there. Review and try again.'}
+          </p>
+
+          {/* Puntaje */}
+          <p className="mt-5 text-6xl font-extrabold">
             <span className={results.passed ? 'text-success' : 'text-warning'}>{pct}%</span>
           </p>
-          <p className="mt-2 text-text-on-dark/70">
-            {results.correct} / {results.total} {es ? 'correctas · tiempo' : 'correct · time'}{' '}
-            {formatTime(timeUsed)}
+          <p className="mt-1 text-xs uppercase tracking-wider text-text-on-dark/50">
+            {es ? 'Puntaje' : 'Score'}
           </p>
-          <p className="mt-1 text-xs text-text-on-dark/50">
+
+          {/* Chips Correctas / Incorrectas / Tiempo */}
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <span className="inline-flex items-center gap-2 rounded-xl bg-success/15 px-4 py-2 text-sm font-semibold text-success">
+              <Line d={ic.checkC} cls="h-4 w-4" /> {es ? 'Correctas' : 'Correct'}: {results.correct}
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-xl bg-error/15 px-4 py-2 text-sm font-semibold text-error">
+              ✕ {es ? 'Incorrectas' : 'Incorrect'}: {incorrect}
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-text-on-dark/80">
+              <Line d={ic.clock} cls="h-4 w-4" /> {formatTime(timeUsed)}
+            </span>
+          </div>
+
+          <p className="mt-5 text-xs text-text-on-dark/50">
             {es ? 'En el examen real:' : 'On the real exam:'} {mock.state.passThreshold}{' '}
             {es ? 'de' : 'of'} {mock.state.examQuestionCount} {es ? 'para aprobar' : 'to pass'}.
           </p>
           {email && (
-            <p className="mt-3 text-xs font-semibold text-success">
+            <p className="mt-2 text-xs font-semibold text-success">
               ✓ {es ? 'Resultado guardado en tu progreso' : 'Result saved to your progress'}
             </p>
           )}
