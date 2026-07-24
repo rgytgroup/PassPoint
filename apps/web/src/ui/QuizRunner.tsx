@@ -149,8 +149,8 @@ export function QuizRunner<Q extends QuizQuestion>({
   const gotIt = revealed && question.options[selectedIdx].correct;
 
   return (
-    <section>
-      <div className="flex items-center justify-between text-sm text-text-secondary">
+    <section className="mx-auto max-w-2xl">
+      <div className="flex items-center justify-between text-sm font-medium text-text-secondary">
         <span>
           {es ? 'Pregunta' : 'Question'} {index + 1} {es ? 'de' : 'of'}{' '}
           {questions.length}
@@ -158,7 +158,7 @@ export function QuizRunner<Q extends QuizQuestion>({
         {renderBadge ? (
           renderBadge(question)
         ) : (
-          <span>
+          <span className="rounded-lg bg-success/10 px-2 py-0.5 text-xs font-semibold text-success">
             {correctCount} {es ? 'correctas' : 'correct'}
           </span>
         )}
@@ -172,7 +172,7 @@ export function QuizRunner<Q extends QuizQuestion>({
         />
       </div>
 
-      <h1 className="mt-5 text-xl font-bold text-text-primary">
+      <h1 className="mt-6 text-xl font-bold leading-snug text-text-primary sm:text-2xl">
         {pick(question, 'text')}
       </h1>
 

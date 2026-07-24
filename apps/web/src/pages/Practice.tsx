@@ -47,10 +47,16 @@ export function Practice() {
   }
 
   return (
-    <QuizRunner
-      questions={questions}
-      onFinish={persist}
-      renderResults={({ correctCount, total, restart }) => {
+    <div>
+      <div className="mx-auto mb-4 max-w-2xl">
+        <Link to={`/${code}/estudiar`} className="text-sm font-semibold text-text-secondary hover:text-primary">
+          ← {es ? 'Temas' : 'Topics'}
+        </Link>
+      </div>
+      <QuizRunner
+        questions={questions}
+        onFinish={persist}
+        renderResults={({ correctCount, total, restart }) => {
         const pct = Math.round((correctCount / total) * 100);
         return (
           <section className="mx-auto max-w-md text-center">
@@ -73,7 +79,8 @@ export function Practice() {
             </div>
           </section>
         );
-      }}
-    />
+        }}
+      />
+    </div>
   );
 }

@@ -132,7 +132,7 @@ export function Mock() {
   // ─── Revisión post-simulacro ───
   if (submitted && reviewing) {
     return (
-      <section>
+      <section className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-text-primary">
             {es ? 'Revisión de respuestas' : 'Review answers'}
@@ -291,7 +291,7 @@ export function Mock() {
   const lowTime = timeLeft <= 30;
 
   return (
-    <section>
+    <section className="mx-auto max-w-2xl">
       <div className="flex items-center justify-between">
         <span className="text-sm text-text-secondary">
           {es ? 'Pregunta' : 'Question'} {index + 1} {es ? 'de' : 'of'} {questions.length} ·{' '}

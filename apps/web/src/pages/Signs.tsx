@@ -11,7 +11,7 @@ export function Signs() {
   const es = lang === 'ES';
 
   return (
-    <section>
+    <section className="mx-auto max-w-5xl">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-text-primary">{t('signals')}</h1>
         <Link to={`/${code}`} className="text-sm text-text-secondary hover:text-primary">
