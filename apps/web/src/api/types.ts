@@ -68,6 +68,53 @@ export interface Readiness {
   total: number;
 }
 
+// ── Smart Study (SPEC §11.1) — motor de reglas, cero IA en runtime ──
+
+export interface TopicMastery {
+  slug: string;
+  nameEn: string;
+  nameEs: string;
+  total: number;
+  seen: number;
+  mastered: number;
+  mastery: number; // % dominio, múltiplo de 5
+  weak: boolean;
+}
+
+export interface StudyPlan {
+  count: number;
+  estMinutes: number;
+  sessionQuestionIds: string[];
+}
+
+export interface StudyResponse {
+  topicMastery: TopicMastery[];
+  focusTopic: { slug: string; nameEn: string; nameEs: string; mastery: number } | null;
+  plan: StudyPlan;
+}
+
+// ── Gamificación ligera (SPEC §11.3) — sin componente social ──
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+}
+
+export interface Gamification {
+  streak: number;
+  longestStreak: number;
+  studiedToday: boolean;
+  achievements: Achievement[];
+  dailyChallenge: {
+    yesterdayBest: number | null;
+    todayBest: number | null;
+    beaten: boolean;
+  };
+}
+
 export interface MockExam {
   state: {
     id: string;

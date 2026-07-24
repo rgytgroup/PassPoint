@@ -1,9 +1,82 @@
 @import 'tailwindcss';
 
+/* Poppins auto-hospedada, subset latino (offline-friendly, cubre ES/EN). */
+@import '@fontsource/poppins/latin-400.css';
+@import '@fontsource/poppins/latin-500.css';
+@import '@fontsource/poppins/latin-600.css';
+@import '@fontsource/poppins/latin-700.css';
+@import '@fontsource/poppins/latin-800.css';
+
+/*
+ * Sistema de diseño v2 — "PassPoint Color Palette v1.0" (SPEC §12.1).
+ * Método: primitivos → tokens semánticos → utilidades. Los componentes usan
+ * SIEMPRE estos tokens (bg-primary, text-secondary…), NUNCA hex hardcodeado.
+ */
+@theme {
+  /* Marca */
+  --color-primary: #5b5ef7; /* CTAs, navegación, marca dominante */
+  --color-primary-dark: #4749e8; /* hover / active */
+  --color-secondary: #7c3aed; /* acentos secundarios */
+
+  /* Feedback semántico — RESERVADOS, nunca decorativos */
+  --color-success: #16c784; /* solo respuestas correctas / progreso */
+  --color-warning: #f5b82e; /* solo advertencias / rachas */
+  --color-error: #ef4444; /* solo errores / validación fallida */
+
+  /* Superficies */
+  --color-background: #f4f5fb; /* canvas claro de la app (dominante) */
+  --color-background-dark: #091325; /* pantallas inmersivas (hero/onboarding/resultados) */
+  --color-surface: #ffffff; /* cards en modo claro */
+  --color-card-dark: #1b2435; /* paneles en modo oscuro */
+  --color-border: #e5e7eb; /* bordes y separadores claros */
+
+  /* Texto */
+  --color-text-primary: #111827; /* títulos */
+  --color-text-secondary: #6b7280; /* descripciones */
+  --color-text-on-dark: #f9fafb; /* texto sobre fondos oscuros */
+
+  /* Tipografía */
+  --font-sans: 'Poppins', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Radios (escala del prototipo) */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+}
+
 :root {
   color-scheme: light;
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Confeti de la pantalla de resultados (SPEC §11.4) — CSS puro, sin librerías. */
+@keyframes ppConfettiFall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+.pp-confetti-piece {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  animation-name: ppConfettiFall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pp-confetti-piece {
+    display: none;
+  }
 }

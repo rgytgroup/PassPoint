@@ -3,8 +3,11 @@ import type {
   StateDetail,
   Question,
   MockExam,
+  MockQuestion,
   ReviewQuestion,
   Readiness,
+  StudyResponse,
+  Gamification,
 } from './types';
 
 // En dev, Vite hace proxy de /api → http://localhost:3000 (ver vite.config.ts).
@@ -82,6 +85,14 @@ export const api = {
     post<{ ok: boolean }>('/me/review/answer', { questionId, correct }),
   /** Probabilidad de aprobar del usuario en un estado (requiere sesión, SPEC §5). */
   getReadiness: (code: string) => get<Readiness>(`/me/readiness/${code}`),
+  /** Dominio por tema + "Plan de hoy" del Smart Study (requiere sesión, SPEC §11.1). */
+  getStudy: (code: string) => get<StudyResponse>(`/me/study/${code}`),
+  /** Preguntas de la sesión Smart Study dirigida (requiere sesión, SPEC §11.1). */
+  getSmartSession: (code: string) =>
+    get<MockQuestion[]>(`/me/study/${code}/session`),
+  /** Racha, logros y reto diario (requiere sesión, SPEC §11.3). */
+  getGamification: (lang: 'ES' | 'EN') =>
+    get<Gamification>(`/me/gamification?lang=${lang}`),
   /** ¿El usuario tiene acceso pagado a un estado? (requiere sesión, SPEC §5). */
   getAccess: (code: string) => get<{ access: boolean }>(`/me/access/${code}`),
   /** Inicia el checkout de Stripe; devuelve la URL a la que redirigir (SPEC §4.7). */

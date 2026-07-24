@@ -11,22 +11,27 @@ export function Layout() {
   return (
     <div className="flex min-h-screen flex-col">
       {!online && (
-        <div className="bg-amber-500 px-4 py-1 text-center text-sm font-medium text-white">
+        <div className="bg-warning px-4 py-1 text-center text-sm font-semibold text-text-primary">
           {lang === 'ES'
             ? 'Sin conexión — usando tu contenido descargado.'
             : 'Offline — using your downloaded content.'}
         </div>
       )}
-      <header className="border-b border-slate-200 bg-white">
+      <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <Link to="/" className="text-lg font-bold text-slate-900">
-            {t('appName')}
+          <Link to="/" className="flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-sm font-extrabold text-white">
+              P
+            </span>
+            <span className="text-lg font-extrabold tracking-tight text-text-primary">
+              {t('appName')}
+            </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {email && (
               <Link
                 to="/repaso"
-                className="rounded-md px-2 py-1 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                className="rounded-lg px-3 py-1.5 text-sm font-semibold text-text-secondary hover:bg-primary/5 hover:text-primary"
               >
                 {t('review')}
               </Link>
@@ -34,8 +39,8 @@ export function Layout() {
             {configured &&
               (email ? (
                 <Link
-                  to="/entrar"
-                  className="max-w-[10rem] truncate rounded-md px-2 py-1 text-sm text-slate-600 hover:bg-slate-100"
+                  to="/perfil"
+                  className="max-w-[10rem] truncate rounded-lg px-3 py-1.5 text-sm text-text-secondary hover:bg-black/5"
                   title={email}
                 >
                   {email}
@@ -43,14 +48,14 @@ export function Layout() {
               ) : (
                 <Link
                   to="/entrar"
-                  className="rounded-md px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                  className="rounded-lg px-3 py-1.5 text-sm font-semibold text-text-secondary hover:bg-primary/5 hover:text-primary"
                 >
-                  Entrar
+                  {lang === 'ES' ? 'Entrar' : 'Sign in'}
                 </Link>
               ))}
             <button
               onClick={toggle}
-              className="rounded-md border border-slate-300 px-3 py-1 text-sm font-medium hover:bg-slate-100"
+              className="rounded-lg border border-border px-3 py-1.5 text-sm font-semibold text-text-secondary hover:bg-black/5"
               aria-label="Cambiar idioma / Switch language"
             >
               {t('langToggle')}
@@ -59,21 +64,21 @@ export function Layout() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
         <Outlet />
       </main>
 
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-5xl px-4 py-6 text-xs text-slate-500">
+      <footer className="border-t border-border bg-surface">
+        <div className="mx-auto max-w-5xl px-4 py-6 text-xs text-text-secondary">
           <p>{t('notAffiliated')}</p>
           <nav className="mt-2 flex gap-4">
-            <Link to="/terminos" className="hover:underline">
+            <Link to="/terminos" className="hover:text-primary">
               Términos
             </Link>
-            <Link to="/privacidad" className="hover:underline">
+            <Link to="/privacidad" className="hover:text-primary">
               Privacidad
             </Link>
-            <Link to="/reembolsos" className="hover:underline">
+            <Link to="/reembolsos" className="hover:text-primary">
               Reembolsos
             </Link>
           </nav>
