@@ -41,7 +41,7 @@ export function OfflineDownload({ code }: { code: string }) {
 
   if (status === 'done') {
     return (
-      <div className="mt-4 flex items-center justify-between rounded-lg bg-green-50 px-4 py-2 text-sm text-green-800">
+      <div className="mt-4 flex items-center justify-between rounded-xl bg-success/10 px-4 py-2 text-sm text-success">
         <span>
           {es
             ? '✓ Descargado para usar sin conexión.'
@@ -56,8 +56,8 @@ export function OfflineDownload({ code }: { code: string }) {
   }
 
   return (
-    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
-      <p className="text-sm text-slate-600">
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+      <p className="text-sm text-text-secondary">
         {es
           ? 'Descarga el banco para practicar sin internet.'
           : 'Download the bank to practice without internet.'}
@@ -65,7 +65,7 @@ export function OfflineDownload({ code }: { code: string }) {
       <button
         onClick={download}
         disabled={status === 'downloading'}
-        className="shrink-0 rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-100 disabled:opacity-50"
+        className="shrink-0 rounded-xl border border-border px-4 py-2 text-sm font-semibold text-text-primary hover:bg-black/5 disabled:opacity-50"
       >
         {status === 'downloading'
           ? es

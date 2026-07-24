@@ -19,22 +19,23 @@ export function AccessBanner({ code }: { code: string }) {
 
   if (data?.access) {
     return (
-      <div className="mt-4 rounded-lg bg-green-50 px-4 py-2 text-sm font-medium text-green-800">
+      <div className="mt-4 rounded-xl bg-success/10 px-4 py-2 text-sm font-semibold text-success">
         {es ? '✓ Tienes acceso completo a este estado.' : '✓ You have full access to this state.'}
       </div>
     );
   }
 
+  // Copy §11.5: sin lenguaje de "plan/suscripción" — es la versión gratis.
   return (
-    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-      <p className="text-sm text-amber-900">
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warning/40 bg-warning/10 px-4 py-3">
+      <p className="text-sm text-text-primary">
         {es
-          ? 'Estás en el plan gratis (solo algunas preguntas). Desbloquea el banco completo.'
-          : "You're on the free plan (only some questions). Unlock the full bank."}
+          ? 'Estás usando la versión gratis (solo algunas preguntas). Desbloquea el banco completo con un solo pago.'
+          : "You're using the free version (only some questions). Unlock the full bank with a one-time payment."}
       </p>
       <Link
         to={`/precios?state=${code}`}
-        className="shrink-0 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+        className="shrink-0 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark"
       >
         {es ? 'Ver precios' : 'See pricing'}
       </Link>
