@@ -9,6 +9,7 @@ import { Signs } from './pages/Signs';
 import { Repaso } from './pages/Repaso';
 import { Precios } from './pages/Precios';
 import { Login } from './pages/Login';
+import { Terminos, Privacidad, Reembolsos } from './pages/Legal';
 import { Placeholder } from './pages/Placeholder';
 
 // Rutas del SPEC §4. Las páginas marcadas como Placeholder se implementan
@@ -41,9 +42,9 @@ export function App() {
         <Route path="/:state/faq/:slug" element={<Placeholder title="FAQ (SEO)" spec="SPEC §4.8" />} />
 
         {/* Legal — SPEC §4.9 */}
-        <Route path="/terminos" element={<Placeholder title="Términos" spec="SPEC §4.9" />} />
-        <Route path="/privacidad" element={<Placeholder title="Privacidad" spec="SPEC §4.9" />} />
-        <Route path="/reembolsos" element={<Placeholder title="Reembolsos" spec="SPEC §4.9" />} />
+        <Route path="/terminos" element={<Terminos />} />
+        <Route path="/privacidad" element={<Privacidad />} />
+        <Route path="/reembolsos" element={<Reembolsos />} />
 
         <Route path="*" element={<Placeholder title="Página no encontrada (404)" />} />
       </Route>
