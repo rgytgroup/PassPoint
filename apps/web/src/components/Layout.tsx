@@ -39,7 +39,7 @@ export function Layout() {
             {configured &&
               (email ? (
                 <Link
-                  to="/entrar"
+                  to="/perfil"
                   className="max-w-[10rem] truncate rounded-lg px-3 py-1.5 text-sm text-text-secondary hover:bg-black/5"
                   title={email}
                 >

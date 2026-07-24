@@ -9,6 +9,7 @@ import { Signs } from './pages/Signs';
 import { Repaso } from './pages/Repaso';
 import { Precios } from './pages/Precios';
 import { Login } from './pages/Login';
+import { Perfil } from './pages/Perfil';
 import { Terminos, Privacidad, Reembolsos } from './pages/Legal';
 import { Placeholder } from './pages/Placeholder';
 
@@ -20,6 +21,7 @@ export function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/entrar" element={<Login />} />
+        <Route path="/perfil" element={<Perfil />} />
         <Route path="/precios" element={<Precios />} />
         <Route path="/repaso" element={<Repaso />} />
 
