@@ -1,0 +1,33 @@
+# Render Blueprint para la API de PassPoint (NestJS + Prisma).
+# Deploy: en render.com → New → Blueprint → conecta rgytgroup/PassPoint.
+# Las variables marcadas sync:false se rellenan en el dashboard (nunca en git).
+services:
+  - type: web
+    name: passpoint-api
+    runtime: node
+    plan: free # (se duerme por inactividad; primer request tras dormir ~50s)
+    branch: proto-dashboard
+    rootDir: .
+    # --include=dev fuerza instalar devDeps (nest-cli, prisma, tsc) que Render
+    # omitiría con NODE_ENV=production. build corre prebuild (prisma generate).
+    buildCommand: npm install --include=dev && npm run build --workspace apps/api
+    startCommand: node apps/api/dist/main.js
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL # Supabase (usar el pooler de conexiones para prod)
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: APP_BASE_URL # URL del frontend en Vercel (habilita CORS + enlaces)
+        sync: false
